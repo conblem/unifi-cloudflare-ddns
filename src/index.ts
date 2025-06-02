@@ -35,16 +35,11 @@ function constructClientOptions(request: Request): ClientOptions {
 function constructDNSRecord(request: Request): AddressableRecord {
 	const url = new URL(request.url);
 	const params = url.searchParams;
-	let ip = params.get('ip') || params.get('myip');
+	const ip = request.headers.get('CF-Connecting-IP');
 	const hostname = params.get('hostname');
 
 	if (ip === null || ip === undefined) {
 		throw new HttpError(422, 'The "ip" parameter is required and cannot be empty. Specify ip=auto to use the client IP.');
-	} else if (ip == 'auto') {
-		ip = request.headers.get('CF-Connecting-IP');
-		if (ip === null) {
-			throw new HttpError(500, 'Request asked for ip=auto but client IP address cannot be determined.');
-		}
 	}
 
 	if (hostname === null || hostname === undefined) {
